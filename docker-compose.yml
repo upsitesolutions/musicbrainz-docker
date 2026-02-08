@@ -91,7 +91,7 @@ services:
         max-file: "10"
     restart: unless-stopped
     environment:
-      - SOLR_HEAP=6g
+      - SOLR_HEAP=16g
       - LOG4J_FORMAT_MSG_NO_LOOKUPS=true
     mem_swappiness: 1
     expose:
