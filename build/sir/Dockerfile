@@ -39,7 +39,7 @@ ARG SIR_VERSION=4.0.1
 LABEL org.metabrainz.sir.version="${SIR_VERSION}"
 
 # hadolint ignore=DL3003
-RUN git clone --depth=1 --branch "v${SIR_VERSION}" https://github.com/metabrainz/sir.git /code \
+RUN git clone --depth=1 --branch master https://github.com/upsitesolutions/sir.git /code \
     && cd /code \
     && pip install -r requirements.txt \
     && rm -f /code/config.ini \
