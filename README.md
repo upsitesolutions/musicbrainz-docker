@@ -137,7 +137,9 @@ docker compose run --rm musicbrainz createdb.sh -fetch
 this is for notebeast custom db
 
 ```bash
-docker compose run --rm musicbrainz bash -c './admin/apply-local-overrides.sh'
+docker compose exec musicbrainz \
+  psql -U musicbrainz -h db -d musicbrainz_db \
+  -f /musicbrainz-server/admin/sql/local_overrides.sql
 ```
 
 <!-- TODO: document available FTP servers -->
