@@ -39,9 +39,10 @@ ARG SIR_VERSION=4.0.1
 LABEL org.metabrainz.sir.version="${SIR_VERSION}"
 
 # hadolint ignore=DL3003
+RUN rm -rf /root/.cache/pip/* ~/.cache/pip/*
 RUN git clone --depth=1 --branch master https://github.com/upsitesolutions/sir.git /code \
     && cd /code \
-    && pip install -r requirements.txt \
+    && pip install --no-cache-dir -r requirements.txt \
     && rm -f /code/config.ini \
     && touch /etc/consul-template.conf
 
