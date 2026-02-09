@@ -42,7 +42,7 @@ LABEL org.metabrainz.sir.version="${SIR_VERSION}"
 RUN rm -rf /root/.cache/pip/* ~/.cache/pip/*
 RUN git clone --depth=1 --branch master https://github.com/upsitesolutions/sir.git /code \
     && cd /code \
-    && pip install --no-cache-dir -r requirements.txt \
+    && pip install --no-cache-dir --upgrade -r requirements.txt \
     && rm -f /code/config.ini \
     && touch /etc/consul-template.conf
 
