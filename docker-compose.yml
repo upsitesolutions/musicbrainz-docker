@@ -127,3 +127,19 @@ services:
     restart: unless-stopped
     expose:
       - "6379"
+
+  lyrics-admin:
+    image: musicbrainz-docker_lyrics-admin
+    build:
+      context: build/lyrics-admin
+      args:
+        - LYRICS_ADMIN_REPO=${LYRICS_ADMIN_REPO}
+    ports:
+      - "7150:7150"
+    environment:
+      - POSTGRES_HOST=db
+      - POSTGRES_USER=musicbrainz
+      - POSTGRES_PASSWORD=musicbrainz
+      - POSTGRES_DB=musicbrainz_db
+    depends_on:
+      - db
