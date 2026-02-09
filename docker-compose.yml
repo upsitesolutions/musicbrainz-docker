@@ -142,5 +142,6 @@ services:
       - POSTGRES_PASSWORD=musicbrainz
       - POSTGRES_DB=musicbrainz_db
       - AUTH_USER_LIST=${AUTH_USER_LIST}
+      - AUTH_SECRET=${AUTH_SECRET}
     depends_on:
       - db
