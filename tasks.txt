@@ -1,0 +1,7 @@
+1) push changes to mmd-schema and mbsssss (make sure that the java code changes ran in mmd: mvn clean package)
+2) in mb-solr and in mb-rngpy we need to update all submodules to latest master and push those changes 
+3) in mb-solr run mvn clean install to generate the new jar file of mb-solr 
+4) in mb-rngpy run source venv/bin/activate make clean and make to generate the new python dode
+5) regenrate the image of mb-solr 
+6) update docker-compose.yml to use the new image of mb-solr
+7) on the server rebuild the needed containers/images
