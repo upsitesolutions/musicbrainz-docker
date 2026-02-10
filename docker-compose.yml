@@ -75,8 +75,7 @@ services:
         max-file: "10"
     volumes:
       - ${SIR_CONFIG_PATH:-./default/indexer.ini}:/code/config.ini
-      - ../sir:/code
-    command: python3 -m sir.web_listener
+    command: python3 /code/web_listener.py
     ports:
       - "7151:7151"
     depends_on:
