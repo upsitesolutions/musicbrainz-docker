@@ -66,6 +66,8 @@ services:
       context: build/sir
     env_file:
       - ./default/postgres.env
+    environment:
+      - PYTHONPATH=/code
     logging:
       driver: "json-file"
       options:
