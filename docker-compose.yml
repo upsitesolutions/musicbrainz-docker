@@ -83,7 +83,7 @@ services:
       context: build/solr
       args:
         - MB_SOLR_VERSION=${MB_SOLR_VERSION:-4.1.0}
-    image: upsitesolutions/mb-solr:custom20
+    image: upsitesolutions/mb-solr:custom21
     logging:
       driver: "json-file"
       options:
