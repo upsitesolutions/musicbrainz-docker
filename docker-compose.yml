@@ -85,10 +85,10 @@ services:
 
   search:
     build:
-      context: https://github.com/upsitesolutions/mb-solr.git#master
+      context: build/solr
       args:
         - MB_SOLR_VERSION=${MB_SOLR_VERSION:-4.1.0}
-    image: musicbrainz-docker_solr
+    image: upsitesolutions/mb-solr:custom26lr
     logging:
       driver: "json-file"
       options:
