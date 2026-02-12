@@ -150,3 +150,22 @@ services:
       - AUTH_SECRET=${AUTH_SECRET}
     depends_on:
       - db
+
+  app-server:
+    image: musicbrainz-docker_app-server
+    build:
+      context: .
+      dockerfile: build/app-server/Dockerfile
+      args:
+        - APP_SERVER_REPO=${APP_SERVER_REPO}
+    ports:
+      - "7152:7152"
+    environment:
+      - POSTGRES_HOST=db
+      - POSTGRES_USER=musicbrainz
+      - POSTGRES_PASSWORD=musicbrainz
+      - POSTGRES_DB=musicbrainz_db
+      - AUTH_USER_LIST=${AUTH_USER_LIST}
+      - AUTH_SECRET=${AUTH_SECRET}
+    depends_on:
+      - db
