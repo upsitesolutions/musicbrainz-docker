@@ -148,10 +148,8 @@ services:
       - POSTGRES_DB=musicbrainz_db
       - AUTH_USER_LIST=${AUTH_USER_LIST}
       - AUTH_SECRET=${AUTH_SECRET}
-      - SOLR_HOST=search
     depends_on:
       - db
-      - search
 
   app-server:
     image: musicbrainz-docker_app-server
@@ -169,5 +167,7 @@ services:
       - POSTGRES_DB=musicbrainz_db
       - AUTH_USER_LIST=${AUTH_USER_LIST}
       - AUTH_SECRET=${AUTH_SECRET}
+      - SOLR_HOST=search
     depends_on:
       - db
+      - search
