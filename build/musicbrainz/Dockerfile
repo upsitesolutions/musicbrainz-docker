@@ -1,4 +1,4 @@
-ARG METABRAINZ_BASE_IMAGE_VERSION=jammy-1.0.1-v0.4
+ARG METABRAINZ_BASE_IMAGE_VERSION=noble-1.0.2-v0.2
 ARG METABRAINZ_BASE_IMAGE_VARIANT=
 ARG METABRAINZ_BASE_IMAGE_TAG=${METABRAINZ_BASE_IMAGE_VERSION}${METABRAINZ_BASE_IMAGE_VARIANT}
 FROM metabrainz/base-image:${METABRAINZ_BASE_IMAGE_TAG}
@@ -10,20 +10,21 @@ LABEL org.metabrainz.based-on-image="metabrainz/base-image:${METABRAINZ_BASE_IMA
 
 ARG DEBIAN_FRONTEND=noninteractive
 
-ARG DOCKERIZE_VERSION=v0.6.1
-RUN curl -sSLO --retry 5 https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && \
-    tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && \
-    rm -f dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
+ARG TARGETARCH
+ARG DOCKERIZE_VERSION=v0.10.1
+RUN curl -sSLO --retry 5 https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-$TARGETARCH-$DOCKERIZE_VERSION.tar.gz && \
+    tar -C /usr/local/bin -xzvf dockerize-linux-$TARGETARCH-$DOCKERIZE_VERSION.tar.gz && \
+    rm -f dockerize-linux-$TARGETARCH-$DOCKERIZE_VERSION.tar.gz
 
-ARG PERL_VERSION=5.38.2
-ARG PERL_SRC_SUM=a0a31534451eb7b83c7d6594a497543a54d488bc90ca00f5e34762577f40655e
+ARG PERL_VERSION=5.42.2
+ARG PERL_SRC_SUM=9384e8deb75b7b1695e5637971b752281aaecd025a3d5d4734d33c1d0adfee47
 
-ARG CPANMINUS_VERSION=1.7047
-ARG CPANMINUS_SRC_SUM=963e63c6e1a8725ff2f624e9086396ae150db51dd0a337c3781d09a994af05a5
+ARG CPANMINUS_VERSION=1.7048
+ARG CPANMINUS_SRC_SUM=59b60907ab9fa4f72ca2004fbe6054911439ae9a906890b4d842a87b25f20f3c
 
 COPY keyrings/* /etc/apt/keyrings/
-ARG NODE_MAJOR_VERSION=20
-ARG POSTGRES_VERSION=16
+ARG NODE_MAJOR_VERSION=24
+ARG POSTGRES_VERSION=18
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN echo "deb [signed-by=/etc/apt/keyrings/nodesource.asc] https://deb.nodesource.com/node_${NODE_MAJOR_VERSION}.x nodistro main" > /etc/apt/sources.list.d/nodesource.list && \
     echo "deb [signed-by=/etc/apt/keyrings/pgdg.asc] http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list && \
@@ -55,7 +56,6 @@ RUN echo "deb [signed-by=/etc/apt/keyrings/nodesource.asc] https://deb.nodesourc
         # Needed for Unicode::ICU::Collator
         pkg-config \
         postgresql-client-${POSTGRES_VERSION} \
-        python2-minimal \
         # Needed to decompress sample data
         xz-utils \
         # Needed for XML:LibXML
@@ -64,7 +64,7 @@ RUN echo "deb [signed-by=/etc/apt/keyrings/nodesource.asc] https://deb.nodesourc
     rm -rf /var/lib/apt/lists/* && \
     # Install perl (in a more recent version than available with apt)
     cd /usr/src && \
-    curl -sSLO --retry 5 https://cpan.metacpan.org/authors/id/P/PE/PEVANS/perl-$PERL_VERSION.tar.gz && \
+    curl -sSLO --retry 5 https://www.cpan.org/src/5.0/perl-$PERL_VERSION.tar.gz && \
     echo "$PERL_SRC_SUM *perl-$PERL_VERSION.tar.gz" | sha256sum --strict --check - && \
     tar -xzf perl-$PERL_VERSION.tar.gz && \
     cd perl-$PERL_VERSION && \
@@ -97,7 +97,7 @@ RUN echo "deb [signed-by=/etc/apt/keyrings/nodesource.asc] https://deb.nodesourc
     apt-get purge --auto-remove -y \
         build-essential
 
-ARG MUSICBRAINZ_SERVER_VERSION=v-2026-01-19.0
+ARG MUSICBRAINZ_SERVER_VERSION=v-2026-05-11.1-schema-change
 LABEL org.metabrainz.musicbrainz-server.version="${MUSICBRAINZ_SERVER_VERSION}"
 RUN git clone --depth=1 --branch master https://github.com/upsitesolutions/musicbrainz-server.git musicbrainz-server
 
@@ -133,12 +133,11 @@ ARG POSTGRES_PASSWORD=doesntmatteraslongasyoudontcompiletests
 ENV BASH_ENV=/noninteractive.bash_env \
     MUSICBRAINZ_BASE_DOWNLOAD_URL=https://data.metabrainz.org/pub/musicbrainz \
     MUSICBRAINZ_CATALYST_DEBUG=0 \
-    MUSICBRAINZ_DB_SCHEMA_SEQUENCE=30 \
+    MUSICBRAINZ_DB_SCHEMA_SEQUENCE=31 \
     MUSICBRAINZ_DEVELOPMENT_SERVER=0 \
     MUSICBRAINZ_POSTGRES_SERVER=db \
     MUSICBRAINZ_POSTGRES_READONLY_SERVER=db \
-    MUSICBRAINZ_RABBITMQ_SERVER=mq \
-    MUSICBRAINZ_REDIS_SERVER=redis \
+    MUSICBRAINZ_VALKEY_SERVER=valkey \
     MUSICBRAINZ_SEARCH_SERVER=search:8983/solr \
     MUSICBRAINZ_SERVER_PROCESSES=10 \
     MUSICBRAINZ_STANDALONE_SERVER=0 \

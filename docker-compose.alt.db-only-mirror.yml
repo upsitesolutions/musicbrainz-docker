@@ -10,7 +10,7 @@ services:
   db:
     build:
       context: build/postgres-prebuilt
-    image: musicbrainz-docker_db:${POSTGRES_VERSION:-16}
+    image: musicbrainz-docker_db:${POSTGRES_VERSION:-18}
     logging:
       driver: "json-file"
       options:
@@ -22,7 +22,7 @@ services:
       - ./default/postgres.env
     shm_size: "2GB"
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql
     expose:
       - "5432"
 
@@ -47,10 +47,10 @@ services:
     command: load-crontab-only.sh
     depends_on:
       - db
-      - redis
+      - valkey
 
-  redis:
-    image: redis:3-alpine
+  valkey:
+    image: valkey/valkey:9-alpine
     logging:
       driver: "json-file"
       options:

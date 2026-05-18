@@ -1,4 +1,4 @@
-ARG METABRAINZ_BASE_IMAGE_VERSION=jammy-1.0.1-v0.4
+ARG METABRAINZ_BASE_IMAGE_VERSION=noble-1.0.2-v0.1
 ARG METABRAINZ_BASE_IMAGE_VARIANT=
 ARG METABRAINZ_BASE_IMAGE_TAG=${METABRAINZ_BASE_IMAGE_VERSION}${METABRAINZ_BASE_IMAGE_VARIANT}
 FROM metabrainz/base-image:${METABRAINZ_BASE_IMAGE_TAG}
@@ -15,15 +15,15 @@ RUN curl -sSLO --retry 5 https://github.com/jwilder/dockerize/releases/download/
     tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && \
     rm -f dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
 
-ARG PERL_VERSION=5.38.2
-ARG PERL_SRC_SUM=a0a31534451eb7b83c7d6594a497543a54d488bc90ca00f5e34762577f40655e
+ARG PERL_VERSION=5.42.2
+ARG PERL_SRC_SUM=9384e8deb75b7b1695e5637971b752281aaecd025a3d5d4734d33c1d0adfee47
 
-ARG CPANMINUS_VERSION=1.7047
-ARG CPANMINUS_SRC_SUM=963e63c6e1a8725ff2f624e9086396ae150db51dd0a337c3781d09a994af05a5
+ARG CPANMINUS_VERSION=1.7048
+ARG CPANMINUS_SRC_SUM=59b60907ab9fa4f72ca2004fbe6054911439ae9a906890b4d842a87b25f20f3c
 
 COPY keyrings/* /etc/apt/keyrings/
-ARG NODE_MAJOR_VERSION=20
-ARG POSTGRES_VERSION=16
+ARG NODE_MAJOR_VERSION=24
+ARG POSTGRES_VERSION=18
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN echo "deb [signed-by=/etc/apt/keyrings/nodesource.asc] https://deb.nodesource.com/node_${NODE_MAJOR_VERSION}.x nodistro main" > /etc/apt/sources.list.d/nodesource.list && \
     echo "deb [signed-by=/etc/apt/keyrings/pgdg.asc] http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list && \
@@ -74,7 +74,7 @@ RUN echo "deb [signed-by=/etc/apt/keyrings/nodesource.asc] https://deb.nodesourc
     rm -rf /var/lib/apt/lists/* && \
     # Install perl (in a more recent version than available with apt)
     cd /usr/src && \
-    curl -sSLO --retry 5 https://cpan.metacpan.org/authors/id/P/PE/PEVANS/perl-$PERL_VERSION.tar.gz && \
+    curl -sSLO --retry 5 https://www.cpan.org/src/5.0/perl-$PERL_VERSION.tar.gz && \
     echo "$PERL_SRC_SUM *perl-$PERL_VERSION.tar.gz" | sha256sum --strict --check - && \
     tar -xzf perl-$PERL_VERSION.tar.gz && \
     cd perl-$PERL_VERSION && \
@@ -102,8 +102,8 @@ RUN echo "deb [signed-by=/etc/apt/keyrings/nodesource.asc] https://deb.nodesourc
     cpanm local::lib && \
     rm -fr /root/.cpanm && \
     # Install ts (needed to run admin background task scripts locally)
-    curl -sSL --retry 5 https://git.joeyh.name/index.cgi/moreutils.git/plain/ts?h=0.69 -o /usr/local/bin/ts && \
-    echo '01b67f3d81e6205f01cc0ada87039293ebc56596955225300dd69ec1257124f5 */usr/local/bin/ts' | sha256sum --strict --check - && \
+    curl -sSL --retry 5 https://git.joeyh.name/index.cgi/moreutils.git/plain/ts?h=0.70 -o /usr/local/bin/ts && \
+    echo '1b15c99d334f89df193c1def89eea1ac6a7922ece5dc08fe438bb5550df9e2e3 */usr/local/bin/ts' | sha256sum --strict --check - && \
     chmod +x /usr/local/bin/ts && \
     # Install yarn from nodejs
     corepack enable
@@ -128,8 +128,7 @@ ENV BASH_ENV=/noninteractive.bash_env \
     MUSICBRAINZ_DEVELOPMENT_SERVER=1 \
     MUSICBRAINZ_POSTGRES_SERVER=db \
     MUSICBRAINZ_POSTGRES_READONLY_SERVER=db \
-    MUSICBRAINZ_RABBITMQ_SERVER=mq \
-    MUSICBRAINZ_REDIS_SERVER=redis \
+    MUSICBRAINZ_VALKEY_SERVER=valkey \
     MUSICBRAINZ_SEARCH_SERVER=search:8983/solr \
     MUSICBRAINZ_SERVER_PROCESSES=1 \
     MUSICBRAINZ_STANDALONE_SERVER=1 \

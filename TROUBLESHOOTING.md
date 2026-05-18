@@ -9,7 +9,7 @@
 - [Loadable library and perl binaries are mismatched](#loadable-library-and-perl-binaries-are-mismatched)
 - [ImportError: No module named](#importerror-no-module-named)
 - [Unknown error executing apt-key](#unknown-error-executing-apt-key)
-- [amqp.exceptions.AccessRefused](#amqpexceptionsaccessrefused)
+- [Can't load [...] for module Unicode::ICU::Collator](#cant-load--for-module-unicodeicucollator)
 
 <!-- tocstop -->
 
@@ -137,30 +137,35 @@ If it isn’t possible, for example with the Unraid operating system,
 run additional `chmod` commands in the Dockerfile; See comments to the
 issue [#263](https://github.com/metabrainz/musicbrainz-docker/pull/263).
 
-## amqp.exceptions.AccessRefused
+## Can't load [...] for module Unicode::ICU::Collator
 
-When running `sir amqp_setup` to prepare live indexing:
+When running the service `musicbrainz` in development setup:
 
 ```log
-amqp.exceptions.AccessRefused: (0, 0): (403) ACCESS_REFUSED - Login was refused using authentication mechanism AMQPLAIN. For details see the broker logfile.
+Error while loading /musicbrainz-server/app.psgi: Can't load '/musicbrainz-server/perl_modules/lib/perl5/x86_64-linux-gnu-thread-multi/auto/Unicode/ICU/Collator/Collator.so' for module Unicode::ICU::Collator: libicui18n.so.70: cannot open shared object file: No such file or directory at /usr/local/lib/perl5/5.38.2/XSLoader.pm line 94.
+at /musicbrainz-server/perl_modules/lib/perl5/x86_64-linux-gnu-thread-multi/Unicode/ICU/Collator.pm line 8.
+BEGIN failed--compilation aborted at /musicbrainz-server/perl_modules/lib/perl5/x86_64-linux-gnu-thread-multi/Unicode/ICU/Collator.pm line 9.
+Compilation failed in require at lib/MusicBrainz/Server/Translation.pm line 14.
+BEGIN failed--compilation aborted at lib/MusicBrainz/Server/Translation.pm line 14.
+Compilation failed in require at (eval 653) line 1.
+BEGIN failed--compilation aborted at (eval 653) line 1.
+at lib/MusicBrainz/Server.pm line 32.
+BEGIN failed--compilation aborted at lib/MusicBrainz/Server.pm line 32.
+Compilation failed in require at /musicbrainz-server/app.psgi line 38.
+BEGIN failed--compilation aborted at /musicbrainz-server/app.psgi line 38.
 ```
 
-The service `mq` is sometimes not creating the user `sir` as expected.
-
+In development setup only, after upgrading the base image for the service `musicbrainz`,
+the version of the Ubuntu package `libicu-dev` in the image might have changed,
+while the compiled Perl modules compiled under MusicBrainz Server working copy
+are still relying on the same version.
 
 Solution:
 
-Recreate the container `mq` as follows:
+Recompile the Perl module in question and restart the service as follows:
 
 ```bash
-docker compose up --force-recreate -d mq
+docker compose exec musicbrainz bash -c 'cpanm --reinstall Unicode::ICU::Collator' && \
+docker compose restart musicbrainz
 ```
-
-Check if it started with creating the user `sir`:
-
-```bash
-docker compose logs -t mq | grep 'Creating user .sir.'
-```
-
-If it doesn’t mention _creating user sir_, try recreating `mq` again.
 

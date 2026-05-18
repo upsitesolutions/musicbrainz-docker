@@ -7,7 +7,7 @@ then
   exit 69 # EX_UNAVAILABLE
 fi
 
-MB_DOCKER_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/../../" && pwd)
+MB_DOCKER_ROOT=$(CDPATH= cd "$(dirname "${BASH_SOURCE[0]}")/../../" && pwd)
 
 cd "$MB_DOCKER_ROOT" || {
   echo >&2 "$SCRIPT_NAME: fail to change directory to '$MB_DOCKER_ROOT'"
@@ -45,5 +45,15 @@ then
 fi
 
 DOCKER_COMPOSE_CMD=${DOCKER_COMPOSE_CMD:-${DOCKER_CMD} compose}
+
+is_service_running() {
+  test -n "$($DOCKER_COMPOSE_CMD ps --status running -q "$1" 2>/dev/null)";
+}
+
+keep_sudo_alive() {
+  # Taken from https://gist.github.com/cowboy/3118588
+  # Keep-alive: update existing sudo time stamp if set, otherwise do nothing.
+  while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+}
 
 # vi: set et sts=2 sw=2 ts=2 :

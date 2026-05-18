@@ -24,6 +24,9 @@ Prerequisites:
     The build sequence must be incremented, if image tag exists already
     (for example when only files under build/musicbrainz/ have changed), in:
         build/musicbrainz-prebuilt/Dockerfile
+
+    For multi-platform builds, you may need to set up QEMU emulation:
+    https://docs.docker.com/build/building/multi-platform/#qemu
 EOH
 )
 
@@ -83,15 +86,15 @@ fi
 
 echo Building...
 
-DOCKER_COMPOSE_OPTS='-f docker-compose.yml -f compose/musicbrainz-own-build.yml'
+COMPOSE_FILES='-f docker-compose.yml -f compose/musicbrainz-own-build.yml -f compose/musicbrainz-multi-arch.yml'
 
 # shellcheck disable=SC2086 # intentional word splitting of options
-$DOCKER_COMPOSE_CMD $DOCKER_COMPOSE_OPTS build --progress=plain --pull musicbrainz
+$DOCKER_CMD buildx bake $COMPOSE_FILES --set musicbrainz.tags="$DEST_IMAGE_TAG" --push musicbrainz
 
 echo Tagging...
 
 # shellcheck disable=SC2086 # intentional word splitting of options
-LOCAL_IMAGE_TAG=$($DOCKER_COMPOSE_CMD $DOCKER_COMPOSE_OPTS config --images | grep -o '[^ ]*musicbrainz$')
+LOCAL_IMAGE_TAG=$($DOCKER_COMPOSE_CMD $COMPOSE_FILES config --images | grep -o '[^ ]*musicbrainz$')
 
 $DOCKER_CMD tag "$LOCAL_IMAGE_TAG" "$DEST_IMAGE_TAG"
 

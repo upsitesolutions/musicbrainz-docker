@@ -1,5 +1,5 @@
 ARG PYTHON_VERSION=3.13
-ARG BASE_IMAGE_DATE=20250313
+ARG BASE_IMAGE_DATE=20260216
 FROM metabrainz/python:$PYTHON_VERSION-$BASE_IMAGE_DATE
 
 ARG PYTHON_VERSION
@@ -35,7 +35,7 @@ RUN apt-get update \
 # Installing sir #
 ##################
 
-ARG SIR_VERSION=4.0.1
+ARG SIR_VERSION=5.0.0-rc.3 SIR_BRANCH="v${SIR_VERSION}"
 LABEL org.metabrainz.sir.version="${SIR_VERSION}"
 
 # hadolint ignore=DL3003
@@ -48,11 +48,9 @@ RUN git clone --depth=1 --branch master https://github.com/upsitesolutions/sir.g
 
 WORKDIR /code
 
-ENV MUSICBRAINZ_RABBITMQ_SERVER=mq \
-    MUSICBRAINZ_POSTGRES_SERVER=db \
+ENV MUSICBRAINZ_POSTGRES_SERVER=db \
     MUSICBRAINZ_POSTGRES_READONLY_SERVER=db \
     MUSICBRAINZ_SEARCH_SERVER=search:8983/solr
 
 ENV POSTGRES_USER=musicbrainz
 ENV POSTGRES_PASSWORD=musicbrainz
-
